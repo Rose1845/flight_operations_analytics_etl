@@ -1,0 +1,12 @@
+flight_project:
+  outputs:
+    dev:
+      dbname: flightoperations
+      host: db
+      pass: password
+      port: 5432
+      schema: flight
+      threads: 4
+      type: postgres
+      user: postgres
+  target: dev

@@ -1,0 +1,77 @@
+version: 2
+
+sources:
+  - name: flight
+    description: "Raw flight operations data ingested from OpenSky Network API"
+    schema: flight
+    tables:
+      - name: flight_snapshots
+        description: "Point-in-time snapshot of all tracked flights from a single API poll"
+        columns:
+          - name: id
+            description: "Auto-incremented primary key"
+            data_tests:
+              - unique
+              - not_null
+          - name: snapshot_time
+            description: "Unix timestamp of the snapshot as returned by the OpenSky API"
+            data_tests:
+              - not_null
+          - name: fetched_at
+            description: "Timestamp of when the row was inserted into the database (UTC)"
+            data_tests:
+              - not_null
+
+      - name: state_vectors
+        description: "Individual aircraft state vectors belonging to a flight snapshot"
+        columns:
+          - name: id
+            description: "Auto-incremented primary key"
+            data_tests:
+              - unique
+              - not_null
+          - name: snapshot_id
+            description: "Foreign key referencing flight_snapshots.id"
+            data_tests:
+              - not_null
+              - relationships:
+                  to: source('flight', 'flight_snapshots')
+                  field: id
+          - name: icao24
+            description: "ICAO 24-bit transponder address (hex string)"
+            data_tests:
+              - not_null
+          - name: callsign
+            description: "Callsign of the aircraft, null if not transmitted"
+          - name: origin_country
+            description: "Country of origin inferred from the ICAO24 address"
+          - name: time_position
+            description: "Unix timestamp of the last position update"
+          - name: last_contact
+            description: "Unix timestamp of the last signal received"
+          - name: longitude
+            description: "Longitude in decimal degrees (WGS-84)"
+          - name: latitude
+            description: "Latitude in decimal degrees (WGS-84)"
+          - name: baro_altitude
+            description: "Barometric altitude in metres"
+          - name: on_ground
+            description: "True if the aircraft is on the ground"
+          - name: velocity
+            description: "Ground speed in metres per second"
+          - name: true_track
+            description: "True track angle in degrees clockwise from north"
+          - name: vertical_rate
+            description: "Vertical rate in metres per second (positive = climbing)"
+          - name: sensors
+            description: "Array of sensor IDs that contributed to this state vector"
+          - name: geo_altitude
+            description: "Geometric (GPS-based) altitude in metres"
+          - name: squawk
+            description: "Transponder squawk code (4-digit octal)"
+          - name: spi
+            description: "Special Purpose Indicator flag"
+          - name: position_source
+            description: "0=ADS-B, 1=ASTERIX, 2=MLAT, 3=FLARM"
+          - name: category
+            description: "Aircraft category (0=No info, 1=No ADS-B, 2=Light, 3=Small...)"
