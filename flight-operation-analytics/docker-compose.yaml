@@ -7,7 +7,7 @@ x-superset-volumes: &superset-volumes
 
 services:
   db:
-    container_name: postgres_container
+    container_name: flight_postgres_container
     image: postgres:14.17
     ports:
       - "5433:5432"
